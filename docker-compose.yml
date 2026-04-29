@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres:17
+    container_name: cs2300-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: student
+      POSTGRES_PASSWORD: pass123
+      POSTGRES_DB: vinyl_vault
+    ports:
+      - "5500:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d
+
+volumes:
+  pgdata:
