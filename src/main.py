@@ -3,6 +3,9 @@ from screen_logic import login_screen, main_screen
 
 
 def main():
+    """
+    Main entry point. Initializes and begins system execution
+    """
     conn = get_connection()
     
     cur_user = -1

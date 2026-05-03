@@ -1,6 +1,12 @@
 import getpass
 
 def register_menu() -> tuple[str, str]:
+    """
+    Retrieves username and password from the user
+
+    Returns:
+        tuple[str, str]: The input username and password
+    """
     username = input("Enter username: ").strip()
     password = getpass.getpass("Enter password: ")
 
@@ -8,6 +14,12 @@ def register_menu() -> tuple[str, str]:
 
 
 def intro_menu() -> str:
+    """
+    Displays an intro menu and retrieves the user choice
+
+    Returns:
+        str: the user choice input
+    """
     print("\n-----WELCOME TO VINYL VAULT-----")
     print("1. Log  In")
     print("2. Create Account")
@@ -17,6 +29,12 @@ def intro_menu() -> str:
 
 
 def main_menu() -> str:
+    """
+    Displays a main menu and retrieves the user choice
+
+    Returns:
+        str: the user choice input
+    """
     print("\n-----MAIN MENU-----")
     print("1. Search Item")
     print("2. Collections")
@@ -28,11 +46,23 @@ def main_menu() -> str:
 
 
 def search_menu() -> str:
+    """
+    Displays a search menu and retrieves the user choice
+
+    Returns:
+        str: the user choice input
+    """
     print("\n-----SEARCH-----")
 
     return input("Search for song/album/artist: ").strip().lower()
 
 def search_res_options() -> str: 
+    """
+    Displays a search result menu and retrieves the user choice
+
+    Returns:
+        str: the user choice input
+    """
     print("\n-----SEARCH RESULTS-----")
     print("1. Add to Collection")
     print("2. Rate")
@@ -42,6 +72,12 @@ def search_res_options() -> str:
 
 
 def profile_menu() -> str:
+    """
+    Displays a user profile menu and retrieves the user choice
+
+    Returns:
+        str: the user choice input
+    """
     print("\n-----PROFILE-----")
     print("1. Edit Username")
     print("2. Logout")
@@ -52,6 +88,12 @@ def profile_menu() -> str:
 
 
 def manage_collection_menu() -> str:
+    """
+    Displays a collection manager menu and retrieves the user choice
+
+    Returns:
+        str: the user choice input
+    """
     print("\n-----COLLECTION MANAGER-----")
     print("1. Rename")
     print("2. Delete")
@@ -61,6 +103,12 @@ def manage_collection_menu() -> str:
 
 
 def add_item_menu() -> str:
+    """
+    Displays an add item menu and retrieves the user choice
+
+    Returns:
+        str: the user choice input
+    """
     print("\n-----Add Item-----")
     print("1. Add Format")
     print("2. Add Genre")

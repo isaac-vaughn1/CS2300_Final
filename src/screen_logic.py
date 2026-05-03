@@ -7,9 +7,21 @@ from menus import *
 from db_ops import *
 
 def clear():
+    """
+    Clears console
+    """
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def login_screen(conn) -> int:
+    """
+    Handles the user choice logic behind the intro menu. Used to create a new account or login
+
+    Args:
+        conn: the postgres database connector object
+
+    Returns:
+        int: The current user ID for tracking throughout the program
+    """
     curr = conn.cursor()
 
     cur_user = -1
@@ -57,7 +69,14 @@ def login_screen(conn) -> int:
     return cur_user
 
 
-def main_screen(conn, cur_user: int) -> bool:
+def main_screen(conn, cur_user: int):
+    """
+    Handles the user choice logic behind the main menu. Exits main menu if the current user ever becomes invalid (-1)
+
+    Args:
+        conn: the postgres database connector object
+        cur_user (int): the current user's ID from the database
+    """
     run = True
     while (run):
         menu_choice = main_menu()
@@ -102,6 +121,14 @@ def main_screen(conn, cur_user: int) -> bool:
 
 
 def search_screen(conn, search_for: str, cur_user: int):
+    """
+    Handles the user choice logic behind searching
+
+    Args:
+        conn: the postgres database connector object
+        search_for (str): the type of item a user has chosen to search for (album/artist/song)
+        cur_user (int): the current user's ID from the database
+    """
     item = input(f"Enter {search_for} name: ").strip()
     rows, cols = search_item(conn.cursor(), search_for, item)
 
@@ -149,6 +176,17 @@ def search_screen(conn, search_for: str, cur_user: int):
 
 
 def profile_screen(conn, cur_user: int, profile_info: tuple[list[tuple], list[str]]) -> int:
+    """
+    Handles the user choice logic behind the profile screen
+
+    Args:
+        conn: the postgres database connector object
+        cur_user (int): the current user's ID from the database
+        profile_info (tuple[list[tuple], list[str]]): a tuple full of profile info retrieved from the db; formatted as (user_info_tuples, list_of_headers)
+
+    Returns:
+        int: The current user value; may be set to -1 to indicate logging out or deletion of account
+    """
     rows, cols = profile_info
 
     run = True
@@ -205,6 +243,15 @@ def profile_screen(conn, cur_user: int, profile_info: tuple[list[tuple], list[st
 
 
 def add_to_collection_screen(conn, cur_user: int, table: str, id: int):
+    """
+    Handles the user choice logic behind the collection addition screen
+
+    Args:
+        conn: the postgres database connector object
+        cur_user (int): the current user's ID from the database
+        table (str): the collection table to add to (song/album)
+        id (int): the current collection's id
+    """
     rows, cols = get_collections(conn.cursor(), cur_user)
 
     collection_ids = {row[0] for row in rows}
@@ -239,6 +286,15 @@ def add_to_collection_screen(conn, cur_user: int, table: str, id: int):
 
 
 def rate_item_screen(conn, cur_user: int, table: str, id: int):
+    """
+    Handles the user choice logic behind the rate item screen
+
+    Args:
+        conn: the postgres database connector object
+        cur_user (int): the current user's ID from the database
+        table (str): the rating table to add to (song/album)
+        id (int): the current item's id
+    """
     run = True
     while (run):
         rating = int(input("Enter a rating (1-5): ").strip())
@@ -262,6 +318,13 @@ def rate_item_screen(conn, cur_user: int, table: str, id: int):
 
 
 def manage_collections_screen(conn, cur_user: int):
+    """
+    Handles the user choice logic behind the collection manager screen
+
+    Args:
+        conn: the postgres database connector object
+        cur_user (int): the current user's ID from the database
+    """
     rows, cols = get_collections(conn.cursor(), cur_user)
 
     collection_ids = {row[0] for row in rows}
@@ -290,6 +353,17 @@ def manage_collections_screen(conn, cur_user: int):
 
 
 def view_collection_screen(conn, collection_info: tuple[list[tuple], list[str]], collection_id: int) -> bool:
+    """
+    Handles the user choice logic behind the collection viewer screen. 
+
+    Args:
+        conn: the postgres database connector object
+        collection_info (tuple[list[tuple], list[str]]): a tuple full of collection info retrieved from the db; formatted as (collection_info_tuples, list_of_headers)
+        collection_id (int): the current collection's id
+
+    Returns:
+        bool: a flag to indicate whether an update to the collection happened. Will be used to indicate if loaded collection results should be reloaded
+    """
     rows, cols = collection_info
 
     update_happened = False
@@ -342,6 +416,13 @@ def view_collection_screen(conn, collection_info: tuple[list[tuple], list[str]],
 
 
 def add_item_screen(conn, cur_user: int):
+    """
+    Handles the user choice logic behind the add item screen
+
+    Args:
+        conn: the postgres database connector object
+        cur_user (int): the current user's id
+    """
     run = True
     while (run):
         menu_choice = add_item_menu()
@@ -400,6 +481,12 @@ def add_item_screen(conn, cur_user: int):
 
 
 def add_song_screen(conn):
+    """
+    Handles the user choice logic behind the add song screen
+
+    Args:
+        conn: the postgres database connector object
+    """
     song_title = input("Enter song title: ").strip()
 
     is_explicit = False
@@ -441,6 +528,12 @@ def add_song_screen(conn):
 
 
 def add_album_screen(conn):
+    """
+    Handles the user choice logic behind the add album screen
+
+    Args:
+        conn: the postgres database connector object
+    """
     album_title = input("Enter album title: ").strip()
 
     release_date = None
@@ -472,6 +565,12 @@ def add_album_screen(conn):
 
 
 def add_artist_screen(conn):
+    """
+    Handles the user choice logic behind the add artist screen
+
+    Args:
+        conn: the postgres database connector object
+    """
     artist_name = input("Enter artist name: ").strip()
     artist_country = input("Enter artist country: ").strip()
 
@@ -545,6 +644,13 @@ def add_artist_screen(conn):
 
 
 def add_collection_screen(conn, cur_user: int):
+    """
+    Handles the user choice logic behind the add collection screen
+
+    Args:
+        conn: the postgres database connector object
+        cur_user (int): the current user's db id
+    """
     is_wishlist = False
     while True:
         is_wishlist = input("Is this collection a wishlist (y/n): ").strip().lower()
@@ -571,6 +677,13 @@ def add_collection_screen(conn, cur_user: int):
 
 
 def print_table(rows: list[tuple], cols: list[str]):
+    """
+    Prints pandas dataframe version of retrieved table data
+
+    Args:
+        rows (list[tuple]): a list of the retrieved rows
+        cols (list[str]): a list of headers
+    """
     df = pd.DataFrame(rows, columns=cols)
 
     if df.empty:

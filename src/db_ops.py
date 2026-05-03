@@ -2,6 +2,12 @@ import psycopg2
 import bcrypt
 
 def get_connection():
+    """
+    Connects to Docker PostgresSQL instance
+
+    Returns:
+        conn | bool: the connection object on successful connection, False otherwise
+    """
     try:
         return psycopg2.connect(
             database="vinyl_vault",
@@ -15,6 +21,16 @@ def get_connection():
 
 
 def create_user(curr, user_info: tuple[str,str]) -> tuple[bool, int]:
+    """
+    Adds a new user to the database
+
+    Args:
+        curr: a postgres database cursor object
+        user_info (tuple[str,str]): A tuple containing username and password strings
+
+    Returns:
+        tuple[bool, int]: a tuple formatted as (successful_creation, user_id)
+    """
     username, password = user_info
     hashpw = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
@@ -52,6 +68,17 @@ def create_user(curr, user_info: tuple[str,str]) -> tuple[bool, int]:
 
 
 def verify_user(curr, username: str, password: str) -> tuple[bool,int]:
+    """
+    Verify a user and log in
+
+    Args:
+        curr: a postgres database cursor object
+        username (str): the username string
+        password (str): the password string
+
+    Returns:
+        tuple[bool, int]: a tuple formatted as (successful_login, user_id)
+    """
     curr.execute(
         "select password_hash, user_id from users where username = %s;", 
         (username,)
@@ -70,6 +97,17 @@ def verify_user(curr, username: str, password: str) -> tuple[bool,int]:
 
 
 def search_item(curr, table: str, filter_val: str) -> tuple[list[tuple], list[str]]:
+    """
+    Search the database for artist/album/song
+
+    Args:
+        curr: a postgres database cursor object
+        table (str): the table to search
+        filter_val (str): the user-input val used to filter data
+
+    Returns:
+        tuple[list[tuple], list[str]]: a tuple full of collection info retrieved from the db; formatted as (retrieved_tuples, list_of_headers)
+    """
     if table in {"album", "song"}:
         query = f"select * from {table} where title like %s"
         curr.execute(query, (f"%{filter_val}%",))
@@ -89,6 +127,16 @@ def search_item(curr, table: str, filter_val: str) -> tuple[list[tuple], list[st
 
 
 def get_user(curr, cur_user: int) -> tuple[list[tuple], list[str]]:
+    """
+    Retrieve user info from the db
+
+    Args:
+        curr: a postgres database cursor object
+        cur_user (int): current user's id
+
+    Returns:
+        tuple[list[tuple], list[str]]: a tuple full of collection info retrieved from the db; formatted as (retrieved_tuples, list_of_headers)
+    """
     curr.execute(
         """
         select u.username, u.country, u.date_joined,
@@ -133,6 +181,17 @@ def get_user(curr, cur_user: int) -> tuple[list[tuple], list[str]]:
 
 
 def update_username(curr, uname: str, cur_user: int) -> bool:
+    """
+    Update a user's username
+
+    Args:
+        curr: a postgres database cursor object
+        uname (str): the new username
+        cur_user (int): the current user's id
+
+    Returns:
+        bool: flag for determining if update was a success
+    """
     curr.execute(
         """
         update users set username = %s where user_id = %s;
@@ -144,6 +203,16 @@ def update_username(curr, uname: str, cur_user: int) -> bool:
 
 
 def delete_user(curr, cur_user: int) -> bool:
+    """
+    Delete a user
+
+    Args:
+        curr: a postgres database cursor object
+        cur_user (int): the current user's id
+
+    Returns:
+        bool: flag for determining if deletion was a success
+    """
     curr.execute(
         """
         delete from users where user_id = %s;
@@ -155,6 +224,16 @@ def delete_user(curr, cur_user: int) -> bool:
 
 
 def get_collections(curr, cur_user: int) -> tuple[list[tuple], list[str]]:
+    """
+    Retrieve all of a user's collections from the db
+
+    Args:
+        curr: a postgres database cursor object
+        cur_user (int): current user's id
+
+    Returns:
+        tuple[list[tuple], list[str]]: a tuple full of  the collection info retrieved from the db; formatted as (retrieved_tuples, list_of_headers)
+    """
     curr.execute(
         """
         select collection_id, collection_name, collection_type
@@ -171,6 +250,18 @@ def get_collections(curr, cur_user: int) -> tuple[list[tuple], list[str]]:
 
 
 def add_to_collection(curr, collection_id: int, table: str, item_id: int) -> bool:
+    """
+    Add an item to a collection
+
+    Args:
+        curr: a postgres database cursor object
+        collection_id (int): the collection id
+        table (str): the corresponding collection table to add to (song/album)
+        item_id (int): the id of the item we are trying to add
+
+    Returns:
+        bool: flag to indicate insertion success
+    """
     allowed_tables = {"song", "album"}
     if table not in allowed_tables:
         return False
@@ -186,6 +277,20 @@ def add_to_collection(curr, collection_id: int, table: str, item_id: int) -> boo
         return False
 
 def add_rating(curr, cur_user: int, rating: int, review: str, table: str, item_id: int) -> bool:
+    """
+    Add/update an item's rating
+
+    Args:
+        curr: a postgres database cursor object
+        cur_user (int): the current user's id
+        rating (int): the new rating value
+        review (str): the user's review of the item
+        table (str): the corresponding rating table we are trying to add to (song/album)
+        item_id (int): the id of the item we are rating
+
+    Returns:
+        bool: flag to indicate insertion success
+    """
     allowed_tables = {"song", "album"}
     if table not in allowed_tables:
         return False
@@ -208,6 +313,16 @@ def add_rating(curr, cur_user: int, rating: int, review: str, table: str, item_i
 
 
 def get_collection_info(curr, collection_id: int) -> tuple[list[tuple], list[str]]:
+    """
+    Retrieve a collection's info from the db
+
+    Args:
+        curr: a postgres database cursor object
+        collection_id (int): the collection id
+
+    Returns:
+        tuple[list[tuple], list[str]]: a tuple full of collection info retrieved from the db; formatted as (retrieved_tuples, list_of_headers)
+    """
     curr.execute(
         """
         select c.collection_id, c.collection_name, c.collection_type, c.date_created,
@@ -254,6 +369,16 @@ def get_collection_info(curr, collection_id: int) -> tuple[list[tuple], list[str
 
 
 def delete_collection(curr, collection_id: int) -> bool:
+    """
+    Delete a collection
+
+    Args:
+        curr: a postgres database cursor object
+        collection_id (int): the collection id
+
+    Returns:
+        bool: flag to indicate deletion success
+    """
     curr.execute(
         """
         delete from collection where collection_id = %s;
@@ -265,6 +390,17 @@ def delete_collection(curr, collection_id: int) -> bool:
 
 
 def update_collection_name(curr, collection_name: str, collection_id: int) -> bool:
+    """
+    Update a collection's name
+
+    Args:
+        curr: a postgres database cursor object
+        collection_name (str): the new collection name
+        collection_id (int): the collection id
+
+    Returns:
+        bool: flag to indicate update success
+    """
     curr.execute(
         """
         update collection set collection_name = %s where collection_id = %s;
@@ -276,6 +412,17 @@ def update_collection_name(curr, collection_name: str, collection_id: int) -> bo
 
 
 def add_format(curr, format: str, description: str) -> bool:
+    """
+    Add a new format
+
+    Args:
+        curr: a postgres database cursor object
+        format (str): the name of the new format
+        description (str): the new format's description
+
+    Returns:
+        bool: flag to indicate insertion success
+    """
     try:
         curr.execute(
             """
@@ -290,6 +437,17 @@ def add_format(curr, format: str, description: str) -> bool:
 
 
 def add_genre(curr, genre: str, description: str) -> bool:
+    """
+    Add a new genre
+
+    Args:
+        curr: a postgres database cursor object
+        genre (str): the name of the new genre
+        description (str): the new genre's description
+
+    Returns:
+        bool: flag to indicate insertion success
+    """
     try:
         curr.execute(
             """
@@ -304,6 +462,19 @@ def add_genre(curr, genre: str, description: str) -> bool:
 
 
 def add_song(curr, title: str, is_explicit: bool, duration: int, release_date) -> bool:
+    """
+    Add a new song
+
+    Args:
+        curr: a postgres database cursor object
+        title (str): the song title
+        is_explicit (bool): indicates whether the song contains explicit/mature material
+        duration (int): duration of the song in minutes
+        release_date (date): yyyy/mm/dd formatted release date of the song
+
+    Returns:
+        bool: flag to indicate insertion success
+    """
     try:
         curr.execute(
             """
@@ -318,6 +489,19 @@ def add_song(curr, title: str, is_explicit: bool, duration: int, release_date) -
 
 
 def add_album(curr, title: str, release_date, label: str, album_runtime: int) -> bool:
+    """
+    Add a new album
+
+    Args:
+        curr: a postgres database cursor object
+        title (str): the album title
+        release_date (date): yyyy/mm/dd formatted release date of the album
+        label (str): the music label that released the album
+        album_runtime (int): runtime of the album in minutes
+
+    Returns:
+        bool: flag to indicate insertion success
+    """
     try:
         curr.execute(
             """
@@ -332,6 +516,19 @@ def add_album(curr, title: str, release_date, label: str, album_runtime: int) ->
 
 
 def add_artist(curr, name: str, country: str, debut_year: int, is_active: bool) -> bool:
+    """
+    Add a new artist
+
+    Args:
+        curr: a postgres database cursor object
+        name (str): name of the artist
+        country (str): artist's country of residence
+        debut_year (int): yyyy formatted year
+        is_active (bool): flag tracking if an artist is active
+
+    Returns:
+        bool: flag to indicate insertion success
+    """
     try:
         curr.execute(
             """
@@ -346,6 +543,19 @@ def add_artist(curr, name: str, country: str, debut_year: int, is_active: bool) 
 
 
 def add_band(curr, name: str, country: str, debut_year: int, num_members: int) -> bool:
+    """
+    Register a new artist as a band
+
+    Args:
+        curr: a postgres database cursor object
+        name (str): name of the artist
+        country (str): artist's country of residence
+        debut_year (int): yyyy formatted year
+        num_members (int): number of members in the band
+
+    Returns:
+        bool: flag to indicate insertion success
+    """
     try:
         curr.execute(
             """
@@ -360,6 +570,19 @@ def add_band(curr, name: str, country: str, debut_year: int, num_members: int) -
 
 
 def add_solo_artist(curr, name: str, country: str, debut_year: int, fname: str) -> bool:
+    """
+    Register a new artist as a solo artist
+
+    Args:
+        curr: a postgres database cursor object
+        name (str): name of the artist
+        country (str): artist's country of residence
+        debut_year (int): yyyy formatted year
+        fname (str): Real first name of the new artist
+
+    Returns:
+        bool: flag to indicate insertion success
+    """
     try:
         curr.execute(
             """
@@ -374,6 +597,18 @@ def add_solo_artist(curr, name: str, country: str, debut_year: int, fname: str) 
 
 
 def add_collection(curr, is_wishlist: bool, name: str, cur_user: int) -> bool:
+    """
+    Add a new collection
+
+    Args:
+        curr: a postgres database cursor object
+        is_wishlist (bool): flag to determine the collection type
+        name (str): the name of the new collection
+        cur_user (int): current user's id to denote owner of the collection
+
+    Returns:
+        bool: flag to indicate insertion success
+    """
     type = "General"
     if is_wishlist:
         type = "Wishlist"
