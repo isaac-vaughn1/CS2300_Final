@@ -1,5 +1,4 @@
-# CS2300_Final
-## Project Setup Guide
+# Project Setup Guide
 
 This project requires Python 3.x.x and Docker Desktop to run properly.
 
@@ -115,6 +114,16 @@ sudo docker compose down -v
 
 ---
 
+## Important Note on Input Handling
+
+This application assumes that **all user input is correctly formatted and valid for the most part**.
+
+To avoid unnecessary errors or unexpected behavior, please ensure that all input provided to the program follows the expected format and constraints exactly as intended.
+
+Invalid or incorrectly formatted input may lead to runtime errors or undefined behavior.
+
+---
+
 ## Project Structure
 
 ```
@@ -156,4 +165,5 @@ python -m venv venv
 - If dependencies change:
 ```bash
 pip install -r requirements.txt
+```
 ```
