@@ -8,8 +8,17 @@ This project requires Python 3.x.x and Docker Desktop to run properly.
 
 Before starting, ensure you have the following installed:
 
-- Python 3.x.x (3.8+ recommended)
+- Python 3.x.x
 - Docker Desktop
+    - Docker Desktop is a GUI application that makes it easy to use Docker on most
+        computer platforms. It includes everything you need to build, run, and manage containers
+        on your computer.
+        - macOS: https://docs.docker.com/desktop/setup/install/mac-install/
+            - It is strongly recommended to install Docker Desktop via Homebrew. This will
+            make updating and managing Docker much (a lot!) easier in the long run,
+            especially when newer versions or patches are released.
+        - Windows: https://docs.docker.com/desktop/setup/install/windows-install/
+        - Linux: https://docs.docker.com/desktop/setup/install/linux/
 - pip (comes with Python)
 
 Verify installations:
