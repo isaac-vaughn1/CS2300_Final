@@ -2,9 +2,9 @@
 -- CREATE DATABASE vinyl_vault; omitted because Docker does this implicitly when the container is spun up
 
 create table users (
-    user_id int primary key,
-    username varchar(255) not null,
-    password_hash varchar(60) not null,
+    user_id int generated always as identity primary key,
+    username varchar(255) not null unique,
+    password_hash varchar(255) not null,
     country varchar(255),
     date_joined date not null
 );
@@ -15,19 +15,19 @@ create table format (
 );
 
 create table album (
-    album_id int primary key,
+    album_id int generated always as identity primary key,
     title varchar(255) not null,
     release_date date null,
     label varchar(255),
-    runtime varchar(4) not null  -- measured in minutes
+    runtime int not null  -- measured in minutes
 );
 
 create table song (
-    song_id int primary key,
+    song_id int generated always as identity primary key,
     title varchar(255) not null,
     is_explicit boolean not null default FALSE,
     duration int not null,  -- measured in minutes
-    release_year int
+    release_date date
 );
 
 create table artist (
@@ -130,7 +130,7 @@ create table song_creation (
 );
 
 create table collection (
-    collection_id int primary key,
+    collection_id int generated always as identity primary key,
     collection_type varchar(10) not null 
         default 'General' 
         check (collection_type in ('General', 'Wishlist')),
@@ -166,7 +166,7 @@ create table song_rating (
         default null 
         check (rating in (0, 1, 2, 3, 4, 5)),
     review text,
-    date_added date not null,
+    date_added date not null default current_date,
 
     constraint PK_srating primary key (user_id, song_id),
     constraint FK_srating_user foreign key (user_id) references users(user_id) on delete cascade,
@@ -180,10 +180,10 @@ create table album_rating (
         default null 
         check (rating in (0, 1, 2, 3, 4, 5)),
     review text,
-    date_added date not null,
+    date_added date not null default current_date,
 
     constraint PK_arating primary key (user_id, album_id),
     constraint FK_arating_user foreign key (user_id) references users(user_id) on delete cascade,
-    constraint FK_arating_song foreign key (album_id) references album(album_id) on delete cascade
+    constraint FK_arating_album foreign key (album_id) references album(album_id) on delete cascade
 );
 

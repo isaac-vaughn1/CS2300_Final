@@ -1,36 +1,19 @@
-import psycopg2
-
-def get_connection():
-    try:
-        return psycopg2.connect(
-            database="vinyl_vault",
-            user="student",
-            password="pass123",
-            host="localhost",
-            port=5500,
-        )
-    except Exception as e:
-        print("Connection error:", e)
-        return None
+from db_ops import get_connection
+from screen_logic import login_screen, main_screen
 
 
-def check_tables(conn):
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT table_name
-        FROM information_schema.tables
-        WHERE table_schema = 'public';
-    """)
+def main():
+    conn = get_connection()
     
-    tables = cursor.fetchall()
-    print("Tables:", tables)
+    cur_user = -1
 
+    while True:  # runs until hitting sys.exit() within either login_screen() or main_screen()
+        cur_user = login_screen(conn)
+        
+        if cur_user != -1:
+            main_screen(conn, cur_user)
 
-# --- main flow ---
-conn = get_connection()
+    conn.close()
 
-if conn:
-    print("Connection to PostgreSQL established successfully.")
-    check_tables(conn)
-else:
-    print("Connection failed.")
+if __name__ == "__main__":
+    main()
