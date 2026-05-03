@@ -32,7 +32,7 @@ docker --version
 
 ## Project Setup
 
-### 1. Clone the Repository
+### 1. Clone the Repository (If applicable)
 
 ```bash
 git clone <your-repo-url>
@@ -137,13 +137,20 @@ Invalid or incorrectly formatted input may lead to runtime errors or undefined b
 
 ```
 .
-├── src/
-│   └── main.py
 ├── sql/
-├── requirements.txt
-├── docker-compose.yml
+│   └── 01_schema.sql
+|   └── 02_sample_date.sql
+├── src/
+│   └── db_ops.py
+│   └── main.py
+│   └── menus.py
+│   └── screen_logic.py
+|
 ├── venv/
+├── .gitignore
+├── docker-compose.yml
 └── README.md
+├── requirements.txt
 ```
 
 ---
