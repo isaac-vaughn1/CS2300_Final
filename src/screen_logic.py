@@ -557,11 +557,11 @@ def add_album_screen(conn):
     if add_album(conn.cursor(), album_title, release_date, label, album_runtime):
         conn.commit()
         clear()
-        print("Song added!")
+        print("Album added!")
     else:
         conn.rollback()
         clear()
-        print("Failed to add song :(")
+        print("Failed to add album :(")
 
 
 def add_artist_screen(conn):
